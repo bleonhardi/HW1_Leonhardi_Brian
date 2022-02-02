@@ -1,0 +1,57 @@
+---
+title: "STAA 566 HW1"
+author: "Brian Leonhardi"
+date: "2/2/2022"
+output: html_document
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding, 
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Code
+
+The purpose of this document is to compare population density data for four 
+countries in Southeast Asia where I would consider spending a good chunk of
+my retirement living in or at least visiting long term.  The data comes from
+a United Nations source, with future predictions based on historic data from
+1950-2019.
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Read in UN database on World Population Prospects (1950-2100)
+data1 <- read.csv("WPP2019_TotalPopulationBySex.csv")
+
+# alternatively, read directly from the online source
+# unPop <- read.csv("https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/CSV_FILES/WPP2019_TotalPopulationBySex.csv")
+
+# determine the column headings of the dataset
+head(data1)
+
+# select 4 countries of interest in Southeast Asia, cutting off in the year 2050
+unPop <- data1 %>% filter(Location %in% c("Cambodia", "Indonesia", "Philippines", 
+        "Thailand"), Time %in% (1950:2050))
+```
+
+## Plotting the Results
+
+
+```{r}
+# plot the population density over time, color coding by country
+p <- ggplot(unPop, aes(Time, PopDensity, col = Location))
+p + labs(title = "Population Density of Four SE Asian Countries",
+         subtitle = "Recorded 1950-2019; Predicted through 2050") +
+  geom_line(aes(group = Location)) + xlab("Year") +
+  ylab("Population Density (persons per square km)") +
+  # add a vertical line at 2019 to distinguish between historic data and predictions
+  geom_vline(xintercept = 2019, color = 'blue')
+```
+
+
